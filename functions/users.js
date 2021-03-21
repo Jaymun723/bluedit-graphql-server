@@ -1,4 +1,4 @@
-const { PrismaClient } = require('@prisma/client')
+const { PrismaClient } = require("@prisma/client")
 const prisma = new PrismaClient()
 
 exports.handler = async (event, context, callback) => {
@@ -6,15 +6,15 @@ exports.handler = async (event, context, callback) => {
     const users = await prisma.user.findMany()
     return {
       statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(users)
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(users),
     }
   } catch (error) {
     console.error(error)
     return {
       statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(error)
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(error),
     }
   }
 }
