@@ -4,6 +4,8 @@
     "module": "CommonJS",
     "outDir": "dist",
     "skipLibCheck": true,
-    "esModuleInterop": true
+    "target": "esnext",
+    "esModuleInterop": true,
+    "removeComments": true
   }
 }
