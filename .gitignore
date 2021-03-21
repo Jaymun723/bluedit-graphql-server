@@ -2,5 +2,5 @@ api/graphql.js
 node_modules/
 **/generated
 **/.env
-
 .vercel
+admin/

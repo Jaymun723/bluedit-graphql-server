@@ -1,6 +1,6 @@
 # Bluedit Graphql Server
 
-Online version: https://vercel.com/jaymun723/bluedit-graphql-server
+Online version: https://bluedit-graphql-server.vercel.app/
 
 The stack:
 
