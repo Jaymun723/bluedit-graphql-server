@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "module": "CommonJS",
+    "outDir": "dist",
+    "skipLibCheck": true,
+    "esModuleInterop": true
+  }
+}

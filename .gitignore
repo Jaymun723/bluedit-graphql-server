@@ -1,6 +1,5 @@
 node_modules/
-.netlify/
-**/.env
-
-# Local Netlify folder
+**/generated
 .netlify
+**/.env
+dist
