@@ -1,4 +1,4 @@
-import { ApolloServer } from "apollo-server-lambda"
+import { ApolloServer } from "@jaymun723/apollo-server-vercel"
 import { schema } from "./schema"
 import { resolvers } from "./resolvers"
 import { getContext } from "./context"
@@ -7,8 +7,10 @@ const server = new ApolloServer({
   typeDefs: schema,
   resolvers,
   context: getContext,
+  playground: true,
+  introspection: true,
 })
 
-const handler = server.createHandler()
+const handler = server.createHandler({ cors: { origin: "*" } })
 
-export { handler }
+export default handler

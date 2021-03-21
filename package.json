@@ -5,10 +5,10 @@
   "main": "dist/index.js",
   "scripts": {
     "prisma": "prisma",
-    "test": "tsc --noEmit",
-    "dev": "ts-node-dev src/devServer.ts",
-    "prisma-generate": "prisma generate",
     "tsc": "tsc",
+    "test": "tsc --noEmit",
+    "dev-server": "ts-node-dev src/devServer.ts",
+    "prisma-generate": "prisma generate",
     "gql-gen": "graphql-codegen --config codegen.yml",
     "rollup-build": "rollup -c rollup.config.js",
     "build": "npm-run-all prisma-generate gql-gen rollup-build"
@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/jaymun723/bluedit-graphql-server#readme",
   "dependencies": {
+    "@jaymun723/apollo-server-vercel": "^0.5.1",
     "@prisma/client": "^2.19.0",
     "@types/express": "^4.17.11",
     "apollo-server-lambda": "^2.21.2",

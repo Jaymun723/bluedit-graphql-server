@@ -1,6 +1,6 @@
-functions/graphql.js
+api/graphql.js
 node_modules/
 **/generated
-.netlify
 **/.env
-dist
+
+.vercel
