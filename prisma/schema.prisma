@@ -1,0 +1,110 @@
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x"]
+}
+
+model User {
+  id String @id @default(uuid())
+
+  createdAt DateTime @default(now())
+
+  email    String @unique
+  name     String @unique
+  password String
+
+  bio String @default("Nothing here, for now...")
+
+  posts    Post[]
+  comments Comment[]
+  votes    Vote[]
+
+  bluedits Bluedit[] @relation(references: [id])
+}
+
+enum ContentType {
+  IMAGE
+  TEXT
+  LINK
+}
+
+model Post {
+  id String @id @default(uuid())
+
+  createdAt    DateTime @default(now())
+  lastEditedAt DateTime @default(now())
+
+  title       String      @unique
+  content     String
+  contentType ContentType
+
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String
+
+  comments Comment[]
+
+  bluedit   Bluedit @relation(fields: [blueditId], references: [id])
+  blueditId String
+
+  votes     Vote[]
+  voteCount Int    @default(0)
+
+  trendingScore Float @default(0)
+}
+
+model Comment {
+  id String @id @default(uuid())
+
+  createdAt    DateTime @default(now())
+  lastEditedAt DateTime @default(now())
+
+  deleted Boolean @default(false)
+
+  content String
+
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String
+
+  post   Post   @relation(fields: [postId], references: [id])
+  postId String
+
+  comment   Comment? @relation("CommentToComment", fields: [commentId], references: [id])
+  commentId String?
+
+  votes     Vote[]
+  voteCount Int    @default(0)
+
+  childComments Comment[] @relation("CommentToComment")
+}
+
+model Bluedit {
+  id String @id @default(uuid())
+
+  name String @unique
+
+  description String
+
+  posts Post[]
+
+  subscribers User[] @relation(references: [id])
+}
+
+model Vote {
+  id String @id @default(uuid())
+
+  up Boolean
+
+  post   Post   @relation(fields: [postId], references: [id])
+  postId String
+
+  comment   Comment? @relation(fields: [commentId], references: [id])
+  commentId String?
+
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String
+}

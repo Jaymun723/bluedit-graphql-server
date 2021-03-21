@@ -1,0 +1,27 @@
+{
+  "name": "bluedit-graphql-server",
+  "version": "1.0.0",
+  "description": "Bluedit GraphQl Server",
+  "main": "dist/index.js",
+  "scripts": {
+    "prisma": "prisma",
+    "build": "prisma generate",
+    "test": "tsc --noEmit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jaymun723/bluedit-graphql-server.git"
+  },
+  "author": "Jaymun723",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jaymun723/bluedit-graphql-server/issues"
+  },
+  "homepage": "https://github.com/jaymun723/bluedit-graphql-server#readme",
+  "dependencies": {
+    "@prisma/client": "^2.19.0"
+  },
+  "devDependencies": {
+    "prisma": "^2.19.0"
+  }
+}
