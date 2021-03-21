@@ -11,8 +11,8 @@ export interface JWTToken {
 }
 
 export async function getUserId(ctx: Context) {
-  const Authorization = ctx.req.get("Authorization")
-  if (Authorization) {
+  if ("Authorization" in ctx.req.headers) {
+    const Authorization = ctx.req.headers["Authorization"] as string
     const token = Authorization.replace("Bearer ", "")
     const verifiedToken = verify(token, APP_SECRET) as JWTToken
     if (verifiedToken && verifiedToken.userId) {
