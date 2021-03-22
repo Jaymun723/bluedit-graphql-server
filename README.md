@@ -10,7 +10,7 @@ The stack:
 - Server: [Apollo Server](https://www.apollographql.com/docs/apollo-server/) hosted on [Vercel](https://vercel.com/)
 - Bundling: [Rollup](https://www.rollupjs.org/)
 - Auth: [jsonwebtoken](https://jwt.io/) and [bcryptjs](https://www.npmjs.com/package/bcryptjs)
-- Web scrappig (for website preview): [Puppeteer](https://pptr.dev/) and [Cheerio](https://cheerio.js.org/)
+- Web scrappig (for website preview): [Cheerio](https://cheerio.js.org/)
 
 ## Installation
 

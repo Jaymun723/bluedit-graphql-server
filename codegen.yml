@@ -1,7 +1,6 @@
 overwrite: true
 schema:
   - "./src/schema.ts"
-  - "scalar Upload"
 documents: null
 generates:
   src/generated/graphql.ts:

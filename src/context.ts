@@ -1,10 +1,10 @@
 import { PrismaClient } from "@prisma/client"
-import { Request, Response } from "express"
+import { VercelRequest, VercelResponse } from "@vercel/node"
 
 export interface Context {
   prisma: PrismaClient
-  req: Request
-  res: Response
+  req: VercelRequest
+  res: VercelResponse
 }
 
 export const prisma = new PrismaClient()

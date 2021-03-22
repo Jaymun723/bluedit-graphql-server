@@ -14,6 +14,7 @@ export const server = new ApolloServer({
   typeDefs: schema,
   resolvers: resolvers as any,
   context: getContext,
+  uploads: false,
 })
 
 const main = async () => {

@@ -2,6 +2,7 @@ import { gql } from "apollo-server-core"
 
 export const schema = gql`
   scalar DateTime
+  scalar Upload
 
   type User {
     id: String!

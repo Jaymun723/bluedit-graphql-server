@@ -8,6 +8,7 @@ import { voteResolver } from "././Vote"
 import { mutationResolver } from "./Mutation"
 import { dateTimeResolver } from "./DateTime"
 import { searchResultResolver } from "./SearchResult"
+import { GraphQLUpload } from "graphql-upload"
 
 export const resolvers: Resolvers = {
   Bluedit: blueditResolver,
@@ -19,5 +20,5 @@ export const resolvers: Resolvers = {
   Mutation: mutationResolver,
   DateTime: dateTimeResolver as any,
   SearchResult: searchResultResolver,
-  // Upload: GraphQLUpload as any,
+  Upload: GraphQLUpload,
 }

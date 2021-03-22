@@ -3,10 +3,11 @@ import { getUserId, trendingFormula, storeImage } from "../../utils"
 import { titleValidator } from "../../validators"
 import { getInfo } from "../../websitePreviewer"
 import { FileUpload } from "graphql-upload"
-// import * as fs from "fs"
-// import * as path from "path"
+import fs from "fs"
+import path from "path"
+import os from "os"
+import { randomBytes } from "crypto"
 // import { STATIC_DIR, SERVER_URL } from "../.."
-// import { randomBytes } from "crypto"
 
 export const createPost: MutationResolvers["createPost"] = async (parent, { input: args }, ctx, info) => {
   const userId = await getUserId(ctx)
@@ -38,14 +39,45 @@ export const createPost: MutationResolvers["createPost"] = async (parent, { inpu
     if (!args.fileContent) {
       throw new Error("Error no file content provided when creating a image post.")
     }
-    const { filename, mimetype, createReadStream } = (await args.fileContent) as FileUpload
+
+    const { createReadStream, filename, mimetype } = (await args.fileContent) as FileUpload
 
     if (!mimetype.startsWith("image/")) {
-      throw new Error("Please upload an image.")
+      throw new Error("Please upload only images.")
     }
-    const imageStream = createReadStream()
 
-    content = await storeImage(imageStream)
+    const inputStream = createReadStream()
+    const fileIdentifier = `${randomBytes(10).toString("hex")}-${filename}`
+    const tmpFilePath = path.join(os.tmpdir(), fileIdentifier)
+    // const tmpFilePath = path.join(__dirname, "", fileIdentifier)
+    const tmpStream = fs.createWriteStream(tmpFilePath)
+
+    const asyncPipe = () =>
+      new Promise((resolve, reject) => {
+        inputStream.pipe(tmpStream).on("finish", resolve).on("error", reject)
+      })
+
+    await asyncPipe()
+
+    const uploadedImage = await storeImage(tmpFilePath)
+
+    fs.unlinkSync(tmpFilePath)
+
+    content = uploadedImage.data.url
+
+    // const { filename, mimetype, createReadStream } = (await args.fileContent) as FileUpload
+
+    // console.log(filename)
+
+    // if (!mimetype.startsWith("image/")) {
+    //   throw new Error("Please upload an image.")
+    // }
+
+    // const imageStream = createReadStream()
+
+    // content = await storeImage(imageStream)
+
+    // console.log(content)
 
     // const incomingStream = createReadStream()
 

@@ -2,7 +2,7 @@ import { verify } from "jsonwebtoken"
 import { Context, prisma } from "./context"
 import fetch from "node-fetch"
 import FormData from "form-data"
-import { ReadStream } from "fs"
+import fs from "fs"
 
 export const APP_SECRET = process.env["APP_SECRET"]!
 
@@ -11,8 +11,8 @@ export interface JWTToken {
 }
 
 export async function getUserId(ctx: Context) {
-  if ("Authorization" in ctx.req.headers) {
-    const Authorization = ctx.req.headers["Authorization"] as string
+  if ("authorization" in ctx.req.headers && typeof ctx.req.headers.authorization === "string") {
+    const Authorization = ctx.req.headers["authorization"] as string
     const token = Authorization.replace("Bearer ", "")
     const verifiedToken = verify(token, APP_SECRET) as JWTToken
     if (verifiedToken && verifiedToken.userId) {
@@ -56,7 +56,35 @@ export const updateTrendingScore = async () => {
   await res
 }
 
-export const storeImage = async (image: ReadStream) => {
+interface ImageDescriptor {
+  filename: string
+  name: string
+  extension: string
+  url: string
+}
+
+interface ImgDBResponse {
+  data: {
+    id: string
+    title: string
+    url_viewer: string
+    url: string
+    display_url: string
+    size: number
+    time: string
+    expiration: string
+    image: ImageDescriptor
+    thumb: ImageDescriptor
+    medium: ImageDescriptor
+    delete_url: string
+  }
+  success: boolean
+  status: number
+}
+
+export const storeImage = async (filePath: string) => {
+  const image = fs.createReadStream(filePath)
+
   const apiUrl = new URL("https://api.imgbb.com/1/upload")
   apiUrl.searchParams.append("key", process.env.IMGDB_API_KEY!)
 
@@ -67,11 +95,13 @@ export const storeImage = async (image: ReadStream) => {
     method: "POST",
     body,
   })
-  const json = (await res.json()) as {
-    data: {
-      url: string
-    }
+
+  if (!res.ok) {
+    console.error(await res.text())
+    throw new Error("Problem when uploading image to ImgDB.")
   }
 
-  return json.data.url
+  const json = (await res.json()) as ImgDBResponse
+
+  return json
 }
