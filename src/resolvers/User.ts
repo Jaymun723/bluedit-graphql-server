@@ -22,7 +22,17 @@ export const userResolver: UserResolvers = {
     return ctx.prisma.user.findUnique({ where: { id: parent.id } }).votes()
   },
   posts: (parent, args, ctx, info) => {
-    return ctx.prisma.user.findUnique({ where: { id: parent.id } }).posts()
+    // return ctx.prisma.user.findUnique({ where: { id: parent.id } }).posts({
+    //   // orderBy: { createdAt: "desc" },
+    //   skip: args.pagination?.skip,
+    //   take: args.pagination?.take,
+    // })
+    return ctx.prisma.post.findMany({
+      where: { authorId: parent.id },
+      take: args.pagination?.take,
+      skip: args.pagination?.skip,
+      orderBy: { createdAt: "desc" },
+    })
   },
   postCount: (parent, args, ctx, info) => {
     return ctx.prisma.post.count({ where: { authorId: parent.id } })

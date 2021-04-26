@@ -19,7 +19,12 @@ export const postResolver: PostResolvers = {
     })
   },
   userVote: async (parent, args, ctx, info) => {
-    const userId = await getUserId(ctx)
+    let userId
+    try {
+      userId = await getUserId(ctx)
+    } catch (error) {
+      return null
+    }
 
     const votes = await ctx.prisma.vote.findMany({
       where: {

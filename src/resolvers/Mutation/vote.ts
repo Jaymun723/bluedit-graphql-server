@@ -1,5 +1,5 @@
 import { MutationResolvers } from "../../generated/graphql"
-import { getUserId } from "../../utils"
+import { getUserId, trendingFormula } from "../../utils"
 
 export const vote: MutationResolvers["vote"] = async (parent, args, ctx, info) => {
   const userId = await getUserId(ctx)
@@ -12,7 +12,9 @@ export const vote: MutationResolvers["vote"] = async (parent, args, ctx, info) =
   // To reuse later
   let comment
   if (args.commentId) {
-    const commentExist = await ctx.prisma.comment.findMany({ where: { id: args.commentId, deleted: false } })
+    const commentExist = await ctx.prisma.comment.findMany({
+      where: { id: args.commentId, deleted: false },
+    })
     if (commentExist.length !== 1) {
       throw new Error("Unable to find this comment.")
     }
@@ -48,7 +50,10 @@ export const vote: MutationResolvers["vote"] = async (parent, args, ctx, info) =
 
         await ctx.prisma.post.update({
           where: { id: args.postId },
-          data: { voteCount: { set: voteCount } },
+          data: {
+            voteCount: { set: voteCount },
+            trendingScore: { set: trendingFormula(voteCount, new Date(postExist.createdAt)) },
+          },
         })
       }
 
@@ -71,7 +76,11 @@ export const vote: MutationResolvers["vote"] = async (parent, args, ctx, info) =
 
         await ctx.prisma.post.update({
           where: { id: args.postId },
-          data: { voteCount: { set: voteCount }, votes: { delete: { id: vote.id } } },
+          data: {
+            voteCount: { set: voteCount },
+            votes: { delete: { id: vote.id } },
+            trendingScore: { set: trendingFormula(voteCount, new Date(postExist.createdAt)) },
+          },
         })
       }
 
@@ -92,12 +101,15 @@ export const vote: MutationResolvers["vote"] = async (parent, args, ctx, info) =
       })
     } else {
       // Update post voteCount
+      let voteCount = postExist.voteCount + (args.up ? 1 : -1)
+
       await ctx.prisma.post.update({
         where: {
           id: args.postId,
         },
         data: {
-          voteCount: { set: postExist.voteCount + (args.up ? 1 : -1) },
+          voteCount: { set: voteCount },
+          trendingScore: { set: trendingFormula(voteCount, new Date(postExist.createdAt)) },
         },
       })
     }

@@ -18,7 +18,7 @@ export const schema = gql`
 
     bio: String!
 
-    posts: [Post!]!
+    posts(pagination: PaginationInput): [Post!]!
     postCount: Int!
 
     comments: [Comment!]!
@@ -145,7 +145,7 @@ export const schema = gql`
     me: User!
 
     users: [User!]!
-    bluedits: [Bluedit!]!
+    bluedits(pagination: PaginationInput): [Bluedit!]!
 
     mainFeed(sort: SortType!, pagination: PaginationInput): [Post!]!
     """

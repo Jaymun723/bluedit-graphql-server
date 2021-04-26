@@ -33,20 +33,24 @@ export const voteCount = (votes: { up: boolean }[]) => {
 // Hacker news formula
 export const trendingFormula = (votes: number, time: Date) => {
   const hourAge = (Date.now() - time.getTime()) / (1000 * 3600)
-  return (votes - 1) / Math.pow(hourAge + 2, 1.8)
+  return (votes + 1) / Math.pow(hourAge + 2, 1.8)
 }
 
 export const updateTrendingScore = async () => {
-  const posts = await prisma.post.findMany({ select: { voteCount: true, id: true, createdAt: true } })
+  const posts = await prisma.post.findMany({
+    select: { voteCount: true, id: true, createdAt: true },
+  })
 
   const res = Promise.all(
     posts.map((post) => {
+      let score = trendingFormula(post.voteCount, post.createdAt)
+      console.log(score)
       return prisma.post.update({
         where: {
           id: post.id,
         },
         data: {
-          trendingScore: { set: trendingFormula(post.voteCount, post.createdAt) },
+          trendingScore: { set: score },
         },
         select: null,
       })
