@@ -7,9 +7,7 @@ export interface Context {
   res: VercelResponse
 }
 
-export const prisma = new PrismaClient()
-
-export const getContext = (ctx: any): Context => {
+export const getContext = (prisma: PrismaClient) => (ctx: any): Context => {
   return {
     prisma,
     ...ctx,

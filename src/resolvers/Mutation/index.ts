@@ -10,7 +10,7 @@ import { vote } from "./vote"
 import { comment } from "./comment"
 import { editComment } from "./editComment"
 import { removeComment } from "./removeComment"
-import { websitePreview } from "./websitePreview"
+import { editTextPost } from "./editTextPost"
 
 export const mutationResolver: MutationResolvers = {
   createAccount,
@@ -24,5 +24,5 @@ export const mutationResolver: MutationResolvers = {
   comment,
   editComment,
   removeComment,
-  websitePreview,
+  editTextPost,
 }

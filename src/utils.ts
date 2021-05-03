@@ -1,7 +1,8 @@
 import { verify } from "jsonwebtoken"
-import { Context, prisma } from "./context"
+import { Context } from "./context"
 import fetch from "node-fetch"
 import FormData from "form-data"
+import { prisma } from "./graphql"
 import fs from "fs"
 
 export const APP_SECRET = process.env["APP_SECRET"]!
@@ -44,7 +45,6 @@ export const updateTrendingScore = async () => {
   const res = Promise.all(
     posts.map((post) => {
       let score = trendingFormula(post.voteCount, post.createdAt)
-      console.log(score)
       return prisma.post.update({
         where: {
           id: post.id,

@@ -161,6 +161,8 @@ export const schema = gql`
     bluedit(id: String, name: String): Bluedit!
     user(id: String, name: String): User!
     comment(id: String!): Comment!
+
+    websitePreview(url: String!): String!
   }
 
   input CreatePostInput {
@@ -206,6 +208,10 @@ export const schema = gql`
     """
     Requires authentification.
     """
+    editTextPost(id: String!, content: String!): Post!
+    """
+    Requires authentification.
+    """
     removePost(id: String!): Post!
 
     #########
@@ -233,7 +239,5 @@ export const schema = gql`
     Requires authentification.
     """
     removeComment(id: String!): Comment!
-
-    websitePreview(url: String!): String!
   }
 `

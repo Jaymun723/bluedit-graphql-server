@@ -5,7 +5,6 @@ export const dateTimeResolver: DateTimeScalarConfig = {
   name: "DateTime",
   description: "Date custom scalar type",
   parseValue(value) {
-    console.log("parseValue", value)
     return new Date(value) // value from the client
   },
   serialize(value) {

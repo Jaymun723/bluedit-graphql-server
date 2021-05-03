@@ -58,8 +58,12 @@ export const titleValidator = (_title: string) => {
 }
 
 export const contentValidator = (content: string) => {
+  if (content.length === 0) {
+    throw new Error("No content provided.")
+  }
+
   if (content.length > 10000) {
-    throw new Error("The caracter limit is 10000.")
+    throw new Error("The character limit is 10000.")
   }
 
   return content

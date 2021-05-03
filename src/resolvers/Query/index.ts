@@ -11,6 +11,7 @@ import { user } from "./user"
 import { post } from "./post"
 import { postComments } from "./postComments"
 import { comment } from "./comment"
+import { websitePreview } from "./websitePreview"
 
 export const queryResolver: QueryResolvers = {
   users,
@@ -25,4 +26,5 @@ export const queryResolver: QueryResolvers = {
   post,
   postComments,
   comment,
+  websitePreview,
 }
