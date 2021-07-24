@@ -16,6 +16,11 @@ export const schema = gql`
     """
     email: String!
 
+    """
+    Requires authentification.
+    """
+    emailOnComment: Boolean!
+
     bio: String!
 
     posts(pagination: PaginationInput): [Post!]!

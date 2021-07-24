@@ -12,6 +12,13 @@ export const userResolver: UserResolvers = {
     }
     throw new Error("You can't view other users email.")
   },
+  emailOnComment: async (parent, args, ctx, info) => {
+    const userId = await getUserId(ctx)
+    if (userId === parent.id) {
+      return parent.emailOnComment
+    }
+    throw new Error("You can't view other users settings.")
+  },
   bluedits: (parent, args, ctx, info) => {
     return ctx.prisma.user.findUnique({ where: { id: parent.id } }).bluedits()
   },

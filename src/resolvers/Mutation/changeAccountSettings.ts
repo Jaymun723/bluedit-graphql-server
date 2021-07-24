@@ -12,49 +12,54 @@ export const changeAccountSettings: MutationResolvers["changeAccountSettings"] =
   const userId = await getUserId(ctx)
   const user = (await ctx.prisma.user.findUnique({ where: { id: userId } }))!
 
-  let name = user.name
-  let email = user.email
-  let bio = user.bio
-  let password: string | undefined
-  let emailOnComment = user.emailOnComment
+  let data: any = {}
 
-  if (args.name) {
-    name = nameValidator(args.name)
+  if (args.name && args.name !== user.name) {
+    const name = nameValidator(args.name)
     const userWithName = await ctx.prisma.user.findUnique({ where: { name } })
     if (userWithName) {
       throw new Error("Name already used.")
     }
+    data.name = {
+      set: name,
+    }
   }
 
-  if (args.email) {
-    email = emailValidator(args.email)
+  if (args.email && args.email !== user.email) {
+    const email = emailValidator(args.email)
     const userWithEmail = await ctx.prisma.user.findUnique({ where: { email } })
     if (userWithEmail) {
       throw new Error("Email already used.")
     }
+    data.email = {
+      set: email,
+    }
   }
 
-  if (args.bio) {
-    bio = bioValidator(args.bio)
+  if (args.bio && args.bio !== user.bio) {
+    const bio = bioValidator(args.bio)
+    data.bio = {
+      set: bio,
+    }
   }
 
   if (args.password) {
-    password = passwordValidator(args.password)
+    let password = passwordValidator(args.password)
     password = hashSync(args.password, 10)
+    data.password = {
+      set: password,
+    }
   }
 
-  if (args.emailOnComment) {
-    emailOnComment = args.emailOnComment
+  if (typeof args.emailOnComment !== "undefined" && args.emailOnComment !== user.emailOnComment) {
+    const emailOnComment = args.emailOnComment
+    data.emailOnComment = {
+      set: emailOnComment,
+    }
   }
 
   return ctx.prisma.user.update({
-    data: {
-      name: { set: name },
-      email: { set: email },
-      bio: { set: bio },
-      password: { set: password },
-      emailOnComment: { set: emailOnComment },
-    },
+    data,
     where: {
       id: userId,
     },
