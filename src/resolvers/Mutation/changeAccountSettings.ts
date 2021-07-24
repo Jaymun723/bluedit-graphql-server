@@ -3,7 +3,12 @@ import { nameValidator, emailValidator, bioValidator, passwordValidator } from "
 import { hashSync } from "bcryptjs"
 import { getUserId } from "../../utils"
 
-export const changeAccountSettings: MutationResolvers["changeAccountSettings"] = async (parent, args, ctx, info) => {
+export const changeAccountSettings: MutationResolvers["changeAccountSettings"] = async (
+  parent,
+  args,
+  ctx,
+  info
+) => {
   const userId = await getUserId(ctx)
   const user = (await ctx.prisma.user.findUnique({ where: { id: userId } }))!
 
@@ -11,6 +16,7 @@ export const changeAccountSettings: MutationResolvers["changeAccountSettings"] =
   let email = user.email
   let bio = user.bio
   let password: string | undefined
+  let emailOnComment = user.emailOnComment
 
   if (args.name) {
     name = nameValidator(args.name)
@@ -37,16 +43,17 @@ export const changeAccountSettings: MutationResolvers["changeAccountSettings"] =
     password = hashSync(args.password, 10)
   }
 
+  if (args.emailOnComment) {
+    emailOnComment = args.emailOnComment
+  }
+
   return ctx.prisma.user.update({
     data: {
       name: { set: name },
       email: { set: email },
       bio: { set: bio },
       password: { set: password },
-      // name,
-      // email,
-      // bio,
-      // password,
+      emailOnComment: { set: emailOnComment },
     },
     where: {
       id: userId,

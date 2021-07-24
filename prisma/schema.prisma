@@ -25,6 +25,8 @@ model User {
   votes    Vote[]
 
   bluedits Bluedit[] @relation(references: [id])
+
+  emailOnComment Boolean @default(true)
 }
 
 enum ContentType {

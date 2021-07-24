@@ -13,6 +13,8 @@ export const sendCOnC = async ({ newComment, previousComment, post }: COnCOption
   const commenter = (await prisma.user.findUnique({ where: { id: newComment.authorId } }))!
   const author = (await prisma.user.findUnique({ where: { id: previousComment.authorId } }))!
 
+  if (!author.emailOnComment) return
+
   const substitutions = {
     $url$: BASE_URL,
     $author$: `/u/${author.name}`,

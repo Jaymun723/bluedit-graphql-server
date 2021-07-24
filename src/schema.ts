@@ -196,7 +196,13 @@ export const schema = gql`
     """
     Requires authentification.
     """
-    changeAccountSettings(name: String, email: String, bio: String, password: String): User!
+    changeAccountSettings(
+      name: String
+      email: String
+      bio: String
+      password: String
+      emailOnComment: Boolean
+    ): User!
 
     #########
     # Posts #
