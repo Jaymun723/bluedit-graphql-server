@@ -1,128 +1,104 @@
+import { Vote } from ".prisma/client"
 import { MutationResolvers } from "../../generated/graphql"
-import { getUserId, trendingFormula } from "../../utils"
+import { computeVoteCount, getUserId, trendingFormula } from "../../utils"
+import { user } from "../Query/user"
 
 export const vote: MutationResolvers["vote"] = async (parent, args, ctx, info) => {
   const userId = await getUserId(ctx)
 
-  const postExist = await ctx.prisma.post.findUnique({ where: { id: args.postId } })
-  if (!postExist) {
+  const post = await ctx.prisma.post.findUnique({ where: { id: args.postId } })
+  if (!post) {
     throw new Error("Unable to find this post.")
   }
 
-  // To reuse later
-  let comment
   if (args.commentId) {
-    const commentExist = await ctx.prisma.comment.findMany({
-      where: { id: args.commentId, deleted: false },
+    const comment = await ctx.prisma.comment.findFirst({
+      where: {
+        id: args.postId,
+        postId: args.postId,
+      },
     })
-    if (commentExist.length !== 1) {
+
+    if (!comment) {
       throw new Error("Unable to find this comment.")
     }
-    comment = commentExist[0]
+
+    const currentVote = await ctx.prisma.vote.findFirst({
+      where: { commentId: comment.id, authorId: userId },
+    })
+
+    let newVote: Vote
+    if (!currentVote) {
+      newVote = await ctx.prisma.vote.create({
+        data: {
+          up: args.up,
+          commentId: comment.id,
+          authorId: userId,
+          postId: post.id,
+        },
+      })
+    } else if (args.up !== currentVote.up) {
+      newVote = await ctx.prisma.vote.update({
+        where: {
+          id: currentVote.id,
+        },
+        data: {
+          up: args.up,
+        },
+      })
+    } else {
+      newVote = await ctx.prisma.vote.delete({
+        where: {
+          id: currentVote.id,
+        },
+      })
+    }
+
+    await computeVoteCount({
+      id: comment.id,
+      type: "comment",
+    })
+
+    return newVote
   }
 
-  const voteExist = await ctx.prisma.vote.findMany({
+  const currentVote = await ctx.prisma.vote.findFirst({
     where: {
+      postId: post.id,
       authorId: userId,
-      commentId: args.commentId,
-      postId: args.postId,
     },
   })
 
-  if (voteExist.length === 1) {
-    // The vote already exist
-    const [vote] = voteExist
-    if (vote.up !== args.up) {
-      // Change in "direction" perform real update
-
-      if (comment) {
-        let voteCount = comment.voteCount
-        // Because we remove previous vote value
-        voteCount += args.up ? 2 : -2
-
-        await ctx.prisma.comment.update({
-          where: { id: comment.id },
-          data: { voteCount: { set: voteCount } },
-        })
-      } else {
-        let voteCount = postExist.voteCount
-        voteCount += args.up ? 2 : -2
-
-        await ctx.prisma.post.update({
-          where: { id: args.postId },
-          data: {
-            voteCount: { set: voteCount },
-            trendingScore: { set: trendingFormula(voteCount, new Date(postExist.createdAt)) },
-          },
-        })
-      }
-
-      return ctx.prisma.vote.update({
-        where: { id: vote.id },
-        data: { up: { set: args.up } },
-      })
-    } else {
-      if (comment) {
-        let voteCount = comment.voteCount
-        voteCount += args.up ? -1 : 1
-
-        await ctx.prisma.comment.update({
-          where: { id: comment.id },
-          data: { voteCount: { set: voteCount }, votes: { delete: { id: vote.id } } },
-        })
-      } else {
-        let voteCount = postExist.voteCount
-        voteCount += args.up ? -1 : 1
-
-        await ctx.prisma.post.update({
-          where: { id: args.postId },
-          data: {
-            voteCount: { set: voteCount },
-            votes: { delete: { id: vote.id } },
-            trendingScore: { set: trendingFormula(voteCount, new Date(postExist.createdAt)) },
-          },
-        })
-      }
-
-      return vote
-    }
-  } else {
-    // New vote !
-
-    // Update comment voteCount
-    if (comment) {
-      await ctx.prisma.comment.update({
-        where: {
-          id: comment.id,
-        },
-        data: {
-          voteCount: { set: comment.voteCount + (args.up ? 1 : -1) },
-        },
-      })
-    } else {
-      // Update post voteCount
-      let voteCount = postExist.voteCount + (args.up ? 1 : -1)
-
-      await ctx.prisma.post.update({
-        where: {
-          id: args.postId,
-        },
-        data: {
-          voteCount: { set: voteCount },
-          trendingScore: { set: trendingFormula(voteCount, new Date(postExist.createdAt)) },
-        },
-      })
-    }
-
-    return ctx.prisma.vote.create({
+  let newVote: Vote
+  if (!currentVote) {
+    newVote = await ctx.prisma.vote.create({
       data: {
-        author: {
-          connect: { id: userId },
-        },
-        post: { connect: { id: args.postId } },
         up: args.up,
-        comment: args.commentId ? { connect: { id: args.commentId } } : undefined,
+        authorId: userId,
+        postId: post.id,
+      },
+    })
+  } else if (args.up !== currentVote.up) {
+    newVote = await ctx.prisma.vote.update({
+      data: {
+        up: args.up,
+      },
+      where: {
+        id: currentVote.id,
+      },
+    })
+  } else {
+    newVote = await ctx.prisma.vote.delete({
+      where: {
+        id: currentVote.id,
       },
     })
   }
+
+  await computeVoteCount({
+    id: post.id,
+    type: "post",
+  })
+
+  return newVote
 }

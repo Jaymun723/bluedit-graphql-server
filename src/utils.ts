@@ -15,13 +15,18 @@ export async function getUserId(ctx: Context) {
   if ("authorization" in ctx.req.headers && typeof ctx.req.headers.authorization === "string") {
     const Authorization = ctx.req.headers["authorization"] as string
     const token = Authorization.replace("Bearer ", "")
-    const verifiedToken = verify(token, APP_SECRET) as JWTToken
-    if (verifiedToken && verifiedToken.userId) {
-      // const user = await ctx.prisma.user.findUnique({ where: { id: verifiedToken.userId } })
-      const user = await ctx.prisma.user.findUnique({ where: { id: verifiedToken.userId } })
-      if (user) {
-        return user.id
+
+    try {
+      const verifiedToken = verify(token, APP_SECRET) as JWTToken
+      if (verifiedToken && verifiedToken.userId) {
+        // const user = await ctx.prisma.user.findUnique({ where: { id: verifiedToken.userId } })
+        const user = await ctx.prisma.user.findUnique({ where: { id: verifiedToken.userId } })
+        if (user) {
+          return user.id
+        }
       }
+    } catch (e) {
+      throw new Error("Unauthorized.")
     }
   }
   throw new Error("Unauthorized.")
@@ -109,3 +114,51 @@ export const storeImage = async (filePath: string) => {
 
   return json
 }
+
+interface ComputeVoteCountOptions {
+  type: "post" | "comment"
+  id: string
+}
+export const computeVoteCount = async (options: ComputeVoteCountOptions) => {
+  const keyId = options.type === "comment" ? "commentId" : "postId"
+
+  const upVotes = await prisma.vote.count({
+    where: {
+      [keyId]: options.id,
+      up: true,
+    },
+  })
+  const downVotes = await prisma.vote.count({
+    where: {
+      [keyId]: options.id,
+      up: false,
+    },
+  })
+
+  const voteCount = upVotes - downVotes
+
+  if (options.type === "comment") {
+    await prisma.comment.update({
+      where: {
+        id: options.id,
+      },
+      data: {
+        voteCount,
+      },
+    })
+  } else {
+    await prisma.post.update({
+      where: {
+        id: options.id,
+      },
+      data: {
+        voteCount,
+      },
+    })
+  }
+}
+
+export const escapeStringRegexp = (str: string) =>
+  str.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&").replace(/-/g, "\\x2d")
+
+export const capitalized = (str: string) => `${str[0].toUpperCase()}${str.slice(1)}`

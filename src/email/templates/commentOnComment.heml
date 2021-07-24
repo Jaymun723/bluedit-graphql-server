@@ -1,0 +1,123 @@
+<heml>
+  <head>
+    <subject>New comment on Bluedit !</subject>
+    <style>
+      body {
+        background-color: #1f2424;
+        font-family: Lato;
+        color: white;
+      }
+      a {
+        color: #1dd2af;
+      }
+      .nav {
+        background-color: #375a7f;
+      }
+      .title {
+        text-align: center;
+      }
+      .title a {
+        text-decoration: none;
+        color: white;
+      }
+      .text {
+        margin: 1rem;
+      }
+      .previous {
+        margin: 0 1rem 0.5rem;
+        border-left: 2px solid grey;
+      }
+      .previous p {
+        margin: 0.2rem 1rem 0.2rem;
+      }
+      .previous-text {
+        font-style: italic;
+      }
+      .comment-wrapper {
+        padding: 0 1rem;
+      }
+      .comment {
+        background-color: #343c3d;
+        border-radius: 8px;
+      }
+      .comment p {
+        margin-left: 1rem;
+      }
+      .comment .auhor {
+        margin-top: 1rem;
+      }
+      .actions {
+        margin: 0 0 1rem 1rem;
+      }
+      .vote a {
+        margin: 0 0.25rem;
+      }
+    </style>
+    <font href="https://fonts.googleapis.com/css?family=Lato"></font>
+    <font href="https://unpkg.com/ionicons@4.5.10-0/dist/css/ionicons.min.css"></font>
+  </head>
+  <body>
+    <row class="nav">
+      <column>
+        <h1 class="title">
+          <a href="$url$">Bluedit</a>
+        </h1>
+      </column>
+    </row>
+    <container>
+      <row>
+        <column>
+          <p class="text">
+            Hello <a href="$author_url$">$author$</a> your comment on the post
+            <a href="$post_url$">"$post_title$"</a>
+            received an answer !
+          </p>
+        </column>
+      </row>
+      <row>
+        <column>
+          <block class="previous">
+            <p class="previous-text">You wrote:</p>
+            <p>$previous_content$</p>
+            <p class="previous-text">$commenter$ answered:</p>
+          </block>
+        </column>
+      </row>
+      <row class="comment-wrapper">
+        <column>
+          <block class="comment">
+            <p class="author">
+              <a href="$commenter_url$">$commenter$</a>
+            </p>
+            <p class="content">$comment$</p>
+            <row>
+              <column>
+                <p class="actions vote">
+                  <i class="icon ion-md-arrow-up"></i>
+                  <a href="$post_url$">Vote</a>
+                  <i class="icon ion-md-arrow-down"></i>
+                </p>
+              </column>
+              <column>
+                <p class="actions">
+                  <i class="icon ion-ios-chatbubbles"></i>
+                  <a href="$post_url$">Answer</a>
+                </p>
+              </column>
+            </row>
+          </block>
+        </column>
+      </row>
+      <row>
+        <column>
+          <p class="text">
+            This email was sent automatically, please do not answer it. To unsubscribe to this kind
+            of email click
+            <a href="$settings_url$">here</a>. You can contact the admin with this email: jaymun723
+            at yahoo dot com
+          </p>
+        </column>
+      </row>
+    </container>
+  </body>
+</heml>
